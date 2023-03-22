@@ -1,4 +1,4 @@
-package com.example.android1.data.interceptor
+package com.example.android1.data.core.interceptor
 
 import com.example.android1.BuildConfig
 import okhttp3.Interceptor

@@ -1,8 +1,8 @@
-package com.example.android1.data
+package com.example.android1.data.weather.datasource.remote
 
-import com.example.android1.data.response.MultipleWeatherResponse
-import com.example.android1.data.response.Sys
-import com.example.android1.data.response.WeatherResponse
+import com.example.android1.data.weather.datasource.remote.response.MultipleWeatherResponse
+import com.example.android1.data.weather.datasource.remote.response.Sys
+import com.example.android1.data.weather.datasource.remote.response.WeatherResponse
 import retrofit2.http.GET
 import retrofit2.http.Query
 import retrofit2.http.QueryMap

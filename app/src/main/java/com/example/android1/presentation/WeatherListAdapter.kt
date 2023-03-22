@@ -1,24 +1,24 @@
-package com.example.android1.ui
+package com.example.android1.presentation
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import com.example.android1.data.WeatherUIModel
 import com.example.android1.databinding.ItemWeatherBinding
+import com.example.android1.domain.weather.WeatherMainInfo
 
 class WeatherListAdapter(
     private val onItemClick: (Int) -> Unit
-): ListAdapter<WeatherUIModel, WeatherViewHolder>(object : DiffUtil.ItemCallback<WeatherUIModel>() {
+): ListAdapter<WeatherMainInfo, WeatherViewHolder>(object : DiffUtil.ItemCallback<WeatherMainInfo>() {
 
     override fun areItemsTheSame(
-        oldItem: WeatherUIModel,
-        newItem: WeatherUIModel
-    ): Boolean = oldItem.id == newItem.id
+        oldItem: WeatherMainInfo,
+        newItem: WeatherMainInfo
+    ): Boolean = oldItem.cityId == newItem.cityId
 
     override fun areContentsTheSame(
-        oldItem: WeatherUIModel,
-        newItem: WeatherUIModel
+        oldItem: WeatherMainInfo,
+        newItem: WeatherMainInfo
     ): Boolean = oldItem == newItem
 
 }) {
