@@ -1,4 +1,4 @@
-package com.example.android1.di.module
+package com.example.android1.di
 
 import com.example.android1.BuildConfig
 import com.example.android1.data.core.interceptor.ApiKeyInterceptor
@@ -6,6 +6,8 @@ import com.example.android1.data.core.interceptor.UnitsOfMeasurementInterceptor
 import com.example.android1.data.weather.datasource.remote.WeatherApi
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -15,6 +17,7 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Named
 
 @Module
+@InstallIn(SingletonComponent::class)
 class NetworkModule {
 
     @Provides

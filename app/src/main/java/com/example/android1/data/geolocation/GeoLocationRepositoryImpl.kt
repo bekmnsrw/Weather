@@ -5,8 +5,9 @@ import com.example.android1.domain.geolocation.GeoLocation
 import com.example.android1.domain.geolocation.GeoLocationRepository
 import com.google.android.gms.location.FusedLocationProviderClient
 import kotlinx.coroutines.tasks.await
+import javax.inject.Inject
 
-class GeoLocationRepositoryImpl(
+class GeoLocationRepositoryImpl @Inject constructor(
     private val client: FusedLocationProviderClient
 ) : GeoLocationRepository {
 

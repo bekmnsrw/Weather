@@ -7,8 +7,9 @@ import com.example.android1.data.weather.mapper.toWeatherMainInfoList
 import com.example.android1.domain.weather.WeatherDetailedInfo
 import com.example.android1.domain.weather.WeatherMainInfo
 import com.example.android1.domain.weather.WeatherRepository
+import javax.inject.Inject
 
-class WeatherRepositoryImpl(
+class WeatherRepositoryImpl @Inject constructor(
     private val weatherApi: WeatherApi,
     private val weatherMainInfoCache: WeatherMainInfoCache
 ) : WeatherRepository {

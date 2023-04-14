@@ -1,14 +1,18 @@
 package com.example.android1.presentation.viewmodel
 
-import androidx.lifecycle.*
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.android1.domain.weather.GetWeatherDetailedInfoUseCase
 import com.example.android1.domain.weather.WeatherDetailedInfo
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.net.UnknownHostException
+import javax.inject.Inject
 
-class WeatherDetailedInfoViewModel(
+@HiltViewModel
+class WeatherDetailedInfoViewModel @Inject constructor(
     private val getWeatherDetailedInfoUseCase: GetWeatherDetailedInfoUseCase
 ): ViewModel() {
 
@@ -41,16 +45,6 @@ class WeatherDetailedInfoViewModel(
                 _error.value = error
             } finally {
                 _loading.value = false
-            }
-        }
-    }
-
-    companion object {
-        fun provideFactory(
-            weatherDetailedInfoUseCase: GetWeatherDetailedInfoUseCase
-        ): ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                WeatherDetailedInfoViewModel(weatherDetailedInfoUseCase)
             }
         }
     }

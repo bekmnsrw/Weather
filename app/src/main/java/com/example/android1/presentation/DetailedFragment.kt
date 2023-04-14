@@ -7,34 +7,27 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import coil.load
-import com.example.android1.App
 import com.example.android1.R
 import com.example.android1.databinding.FragmentDetailedBinding
-import com.example.android1.domain.weather.GetWeatherDetailedInfoUseCase
 import com.example.android1.presentation.viewmodel.WeatherDetailedInfoViewModel
 import com.example.android1.utils.convertMillisecondsToHoursAndMinutes
 import com.example.android1.utils.convertPressureIntoMmHg
 import com.example.android1.utils.convertWindAngleIntoDirection
 import com.example.android1.utils.showSnackbar
+import dagger.hilt.android.AndroidEntryPoint
 import java.net.UnknownHostException
-import javax.inject.Inject
 import kotlin.math.roundToInt
 
+@AndroidEntryPoint
 class DetailedFragment : Fragment(R.layout.fragment_detailed) {
 
     private var viewBinding: FragmentDetailedBinding? = null
 
     private var cityId: Int? = null
 
-    @Inject
-    lateinit var weatherDetailedInfoUseCase: GetWeatherDetailedInfoUseCase
-
-    private val viewModel: WeatherDetailedInfoViewModel by viewModels {
-        WeatherDetailedInfoViewModel.provideFactory(weatherDetailedInfoUseCase)
-    }
+    private val viewModel: WeatherDetailedInfoViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        App.appComponent.injectDetailedFragment(this)
         super.onCreate(savedInstanceState)
         cityId = arguments?.getInt(MainFragment.CITY_ID)
     }

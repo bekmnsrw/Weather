@@ -2,10 +2,10 @@ package com.example.android1
 
 import android.app.Application
 import androidx.viewbinding.BuildConfig
-import com.example.android1.di.component.AppComponent
-import com.example.android1.di.component.DaggerAppComponent
+import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
 
+@HiltAndroidApp
 class App : Application() {
 
     override fun onCreate() {
@@ -14,13 +14,5 @@ class App : Application() {
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
         }
-
-        appComponent = DaggerAppComponent.builder()
-            .applicationContext(applicationContext = applicationContext)
-            .build()
-    }
-
-    companion object {
-        lateinit var appComponent: AppComponent
     }
 }
