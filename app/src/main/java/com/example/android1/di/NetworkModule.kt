@@ -4,6 +4,9 @@ import com.example.android1.BuildConfig
 import com.example.android1.data.core.interceptor.ApiKeyInterceptor
 import com.example.android1.data.core.interceptor.UnitsOfMeasurementInterceptor
 import com.example.android1.data.weather.datasource.remote.WeatherApi
+import com.example.android1.di.qualifier.InterceptApiKey
+import com.example.android1.di.qualifier.InterceptLogging
+import com.example.android1.di.qualifier.InterceptUnitsOfMeasurement
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -14,14 +17,13 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
-import javax.inject.Named
 
 @Module
 @InstallIn(SingletonComponent::class)
 class NetworkModule {
 
     @Provides
-    @Named("logging_interceptor")
+    @InterceptLogging
     fun provideLoggingInterceptor(): Interceptor = HttpLoggingInterceptor().apply {
         level = if (BuildConfig.DEBUG) {
             HttpLoggingInterceptor.Level.BODY
@@ -31,18 +33,18 @@ class NetworkModule {
     }
 
     @Provides
-    @Named("api_key_interceptor")
+    @InterceptApiKey
     fun provideApiKeyInterceptor(): Interceptor = ApiKeyInterceptor()
 
     @Provides
-    @Named("units_of_measurement_interceptor")
+    @InterceptUnitsOfMeasurement
     fun provideUnitsOfMeasurementInterceptor(): Interceptor = UnitsOfMeasurementInterceptor()
 
     @Provides
     fun provideHttpClient(
-        @Named("logging_interceptor") loggingInterceptor: Interceptor,
-        @Named("api_key_interceptor") apiKeyInterceptor: Interceptor,
-        @Named("units_of_measurement_interceptor") unitsOfMeasurementInterceptor: Interceptor
+        @InterceptLogging loggingInterceptor: Interceptor,
+        @InterceptApiKey apiKeyInterceptor: Interceptor,
+        @InterceptUnitsOfMeasurement unitsOfMeasurementInterceptor: Interceptor
     ): OkHttpClient = OkHttpClient.Builder()
         .addInterceptor(loggingInterceptor)
         .addInterceptor(apiKeyInterceptor)
