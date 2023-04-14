@@ -6,6 +6,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import coil.load
 import com.example.android1.R
 import com.example.android1.databinding.FragmentDetailedBinding
@@ -16,6 +17,7 @@ import com.example.android1.utils.convertWindAngleIntoDirection
 import com.example.android1.utils.showSnackbar
 import dagger.hilt.android.AndroidEntryPoint
 import java.net.UnknownHostException
+import javax.inject.Inject
 import kotlin.math.roundToInt
 
 @AndroidEntryPoint
@@ -23,20 +25,22 @@ class DetailedFragment : Fragment(R.layout.fragment_detailed) {
 
     private var viewBinding: FragmentDetailedBinding? = null
 
-    private var cityId: Int? = null
+    private val args: DetailedFragmentArgs by navArgs()
 
-    private val viewModel: WeatherDetailedInfoViewModel by viewModels()
+    @Inject
+    lateinit var viewModelFactory: WeatherDetailedInfoViewModel.WeatherDetailedInfoViewModelFactory
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        cityId = arguments?.getInt(MainFragment.CITY_ID)
+    private val viewModel: WeatherDetailedInfoViewModel by viewModels {
+        WeatherDetailedInfoViewModel.provideFactory(viewModelFactory, args.cityId)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewBinding = FragmentDetailedBinding.bind(view)
 
-        viewModel.getWeatherInCity(cityId!!)
+        if (args.cityId != -1) {
+            viewModel.getWeatherInCity()
+        }
 
         observeViewModel()
 

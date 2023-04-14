@@ -7,10 +7,10 @@ import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ViewModelComponent
+import dagger.hilt.components.SingletonComponent
 
 @Module(includes = [BindWeatherModule::class])
-@InstallIn(ViewModelComponent::class)
+@InstallIn(SingletonComponent::class)
 class WeatherModule {
 
     @Provides
@@ -18,7 +18,7 @@ class WeatherModule {
 }
 
 @Module
-@InstallIn(ViewModelComponent::class)
+@InstallIn(SingletonComponent::class)
 interface BindWeatherModule {
 
     @Binds

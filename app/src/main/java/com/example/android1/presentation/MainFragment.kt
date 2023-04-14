@@ -215,11 +215,8 @@ class MainFragment : Fragment(R.layout.fragment_main) {
     }
 
     private fun navigateOnDetailedFragment(cityId: Int) {
-        val bundle = Bundle()
-        bundle.putInt(CITY_ID, cityId)
-
-        findNavController()
-            .navigate(R.id.action_mainFragment_to_detailedFragment, bundle)
+        val action = MainFragmentDirections.actionMainFragmentToDetailedFragment(cityId)
+        findNavController().navigate(action)
     }
 
     private fun showLoading(isShow: Boolean) {
@@ -270,7 +267,5 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         private const val DEFAULT_LATITUDE = 10.0
         private const val RV_SPACING = 16.0F
         private const val NUMBER_OF_CITIES = 10
-
-        const val CITY_ID = "CITY_ID"
     }
 }
