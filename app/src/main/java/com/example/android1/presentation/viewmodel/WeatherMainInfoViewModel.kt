@@ -3,16 +3,18 @@ package com.example.android1.presentation.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.example.android1.domain.geolocation.GeoLocation
 import com.example.android1.domain.geolocation.GetGeoLocationUseCase
 import com.example.android1.domain.weather.GetCityIdUseCase
 import com.example.android1.domain.weather.GetWeatherMainInfoUseCase
 import com.example.android1.domain.weather.WeatherMainInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
-import retrofit2.HttpException
-import timber.log.Timber
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.disposables.Disposable
+import io.reactivex.rxjava3.kotlin.plusAssign
+import io.reactivex.rxjava3.kotlin.subscribeBy
+import retrofit2.adapter.rxjava3.HttpException
 import java.net.UnknownHostException
 import javax.inject.Inject
 
@@ -21,7 +23,7 @@ class WeatherMainInfoViewModel @Inject constructor(
     private val getWeatherMainInfoUseCase: GetWeatherMainInfoUseCase,
     private val getCityIdUseCase: GetCityIdUseCase,
     private val getGeoLocationUseCase: GetGeoLocationUseCase
-): ViewModel() {
+) : ViewModel() {
 
     private val _loading = MutableLiveData(false)
     val loading: LiveData<Boolean>
@@ -49,21 +51,21 @@ class WeatherMainInfoViewModel @Inject constructor(
     val geoLocation: LiveData<GeoLocation>
         get() = _geoLocation
 
+    private var weatherDisposable: CompositeDisposable = CompositeDisposable()
+    private var geoLocationDisposable: Disposable? = null
+
     fun getUserLocation(arePermissionsGranted: Boolean) {
         getLocation(arePermissionsGranted)
     }
 
     private fun getLocation(arePermissionsGranted: Boolean) {
-        viewModelScope.launch {
-            try {
-                getGeoLocationUseCase.invoke(arePermissionsGranted).also {
-                    _geoLocation.value = it
-                }
-            } catch (error: Throwable) {
-                _error.value = error
-                Timber.e("$error")
-            }
-        }
+        geoLocationDisposable = getGeoLocationUseCase(arePermissionsGranted)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(onSuccess = {
+                _geoLocation.value = it
+            }, onError = {
+                _error.value = it
+            })
     }
 
     fun getCityIdByName(cityName: String) {
@@ -71,25 +73,20 @@ class WeatherMainInfoViewModel @Inject constructor(
     }
 
     private fun getCityId(cityName: String) {
-        viewModelScope.launch {
-            try {
-                _loading.value = true
-                getCityIdUseCase.invoke(cityName).also {
-                    _cityId.value = it
-                    _cityId.value = null
+        weatherDisposable += getCityIdUseCase(cityName)
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnSubscribe { _loading.value = true }
+            .doAfterTerminate { _loading.value = false }
+            .subscribeBy(onSuccess = {
+                _cityId.value = it
+                _cityId.value = null
+            }, onError = {
+                when (it.javaClass) {
+                    UnknownHostException::class.java -> showInternetConnectionError.value = false
+                    HttpException::class.java -> showHttpError.value = false
                 }
-            } catch (noInternetConnection: UnknownHostException) {
-                showInternetConnectionError.value = true
-                _error.value = noInternetConnection
-            } catch (httpException: HttpException) {
-                showHttpError.value = false
-                _error.value = httpException
-            } catch (error: Throwable) {
-                _error.value = error
-            } finally {
-                _loading.value = false
-            }
-        }
+                _error.value = it
+            })
     }
 
     fun getNearbyCities(
@@ -112,27 +109,27 @@ class WeatherMainInfoViewModel @Inject constructor(
         numberOfCities: Int,
         isLocal: Boolean
     ) {
-        viewModelScope.launch {
-            try {
-                _loading.value = true
-                getWeatherMainInfoUseCase.invoke(
-                    mapOf(
-                        "lat" to "$latitude",
-                        "lon" to "$longitude",
-                        "cnt" to "$numberOfCities"
-                    ),
-                    isLocal
-                ).also {
-                    _weatherDetailedInfo.value = it
-                }
-            } catch (noInternetConnection: UnknownHostException) {
-                _error.value = noInternetConnection
-            } catch (error: Throwable) {
-                _error.value = error
-            }
-            finally {
-                _loading.value = false
-            }
-        }
+        weatherDisposable += getWeatherMainInfoUseCase(
+            mapOf(
+                "lat" to "$latitude",
+                "lon" to "$longitude",
+                "cnt" to "$numberOfCities"
+            ),
+            isLocal
+        )
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnSubscribe { _loading.value = true }
+            .doAfterTerminate { _loading.value = false }
+            .subscribeBy(onSuccess = {
+                _weatherDetailedInfo.value = it
+            }, onError = {
+                _error.value = it
+            })
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        weatherDisposable.clear()
+        geoLocationDisposable?.dispose()
     }
 }

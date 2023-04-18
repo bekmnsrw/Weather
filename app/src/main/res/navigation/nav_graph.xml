@@ -19,8 +19,8 @@
             app:popUpTo="@id/mainFragment" />
         <argument
             android:name="cityId"
-            app:argType="integer"
-            android:defaultValue="-1" />
+            android:defaultValue="-1"
+            app:argType="integer" />
     </fragment>
     <fragment
         android:id="@+id/mainFragment"

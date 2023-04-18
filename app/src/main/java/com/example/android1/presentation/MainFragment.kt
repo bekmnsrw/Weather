@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.provider.Settings
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.SearchView.OnQueryTextListener
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat.startActivity
@@ -23,8 +24,14 @@ import com.example.android1.databinding.FragmentMainBinding
 import com.example.android1.presentation.viewmodel.WeatherMainInfoViewModel
 import com.example.android1.utils.showSnackbar
 import dagger.hilt.android.AndroidEntryPoint
-import retrofit2.HttpException
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.BackpressureStrategy
+import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.disposables.Disposable
+import io.reactivex.rxjava3.kotlin.subscribeBy
+import retrofit2.adapter.rxjava3.HttpException
 import java.net.UnknownHostException
+import java.util.concurrent.TimeUnit
 
 @AndroidEntryPoint
 class MainFragment : Fragment(R.layout.fragment_main) {
@@ -37,6 +44,8 @@ class MainFragment : Fragment(R.layout.fragment_main) {
 
     private var longitude: Double = DEFAULT_LONGITUDE
     private var latitude: Double = DEFAULT_LATITUDE
+
+    private var searchDisposable: Disposable? = null
 
     private var requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
@@ -73,6 +82,11 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        searchCity()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requestLocationPermissions()
@@ -83,12 +97,12 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         viewBinding = FragmentMainBinding.bind(view)
         initAdapter()
         observeViewModel()
-        onSearchClick()
     }
 
     override fun onDestroy() {
         super.onDestroy()
         viewBinding = null
+        searchDisposable?.dispose()
     }
 
     private fun suggestUserToTurnOnGPS() {
@@ -113,7 +127,7 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         )
     }
 
-    private fun getLocation(newLongitude: Double?, newLatitude: Double?) {
+    private fun manageGeoLocation(newLongitude: Double?, newLatitude: Double?) {
         if (newLongitude != null && newLatitude != null) {
             if (newLongitude != longitude || newLatitude != latitude) {
                 longitude = newLongitude
@@ -164,11 +178,12 @@ class MainFragment : Fragment(R.layout.fragment_main) {
             cityId.observe(viewLifecycleOwner) {
                 if (it == null) return@observe
                 navigateOnDetailedFragment(it)
+                viewBinding?.search?.setQuery(null, true)
             }
 
             geoLocation.observe(viewLifecycleOwner) {
                 if (it == null) return@observe
-                getLocation(it.longitude, it.latitude)
+                manageGeoLocation(it.longitude, it.latitude)
             }
         }
     }
@@ -195,22 +210,33 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         navigateOnDetailedFragment(id)
     }
 
-    private fun onSearchClick() {
-        viewBinding?.run {
-            search.setOnQueryTextListener(object : OnQueryTextListener {
+    private fun SearchView.observeQuery(): Flowable<String> =
+        Flowable.create({ emitter ->
+            setOnQueryTextListener(object : OnQueryTextListener {
                 override fun onQueryTextSubmit(query: String?): Boolean {
-                    if (query != null) {
-                        viewModel.getCityIdByName(query.toString()).also {
-                            search.setQuery(null, true)
-                        }
-                    }
-                    return true
+                    return false
                 }
 
                 override fun onQueryTextChange(newText: String?): Boolean {
-                    return true
+                    emitter.onNext(newText.toString())
+                    return false
                 }
             })
+        }, BackpressureStrategy.LATEST)
+
+    private fun searchCity() {
+        viewBinding?.run {
+            searchDisposable?.dispose()
+            searchDisposable = search.observeQuery()
+                .debounce(500L, TimeUnit.MILLISECONDS)
+                .filter { it.length > 2 }
+                .distinctUntilChanged()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(onNext = {
+                    viewModel.getCityIdByName(it)
+                }, onError = {
+                    showError(getString(R.string.general_error_message))
+                })
         }
     }
 

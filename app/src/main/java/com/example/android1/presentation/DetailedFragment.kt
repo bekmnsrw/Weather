@@ -80,7 +80,10 @@ class DetailedFragment : Fragment(R.layout.fragment_detailed) {
                 if (it == null) return@observe
 
                 if (it.javaClass == UnknownHostException::class.java) {
-                    showError(getString(R.string.internet_connection_error_message))
+                    if (showInternetConnectionError.value == false) {
+                        showError(getString(R.string.internet_connection_error_message))
+                        showInternetConnectionError.value = true
+                    }
                 } else {
                     showError(getString(R.string.general_error_message))
                 }

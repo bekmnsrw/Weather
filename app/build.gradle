@@ -52,17 +52,24 @@ dependencies {
 
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
 
-    // region coroutines
+//     region coroutines
     def coroutines = '1.6.4'
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-play-services:$coroutines"
+//     endregion
+
+    // region rxjava
+    implementation 'io.reactivex.rxjava3:rxandroid:3.0.2'
+    implementation 'io.reactivex.rxjava3:rxjava:3.1.6'
+    implementation "io.reactivex.rxjava3:rxkotlin:3.0.1"
     // endregion
 
     // region network
     def retrofit = '2.9.0'
     implementation "com.squareup.retrofit2:retrofit:$retrofit"
     implementation "com.squareup.retrofit2:converter-gson:$retrofit"
+    implementation "com.squareup.retrofit2:adapter-rxjava3:$retrofit"
 
     def okhttp = '4.10.0'
     implementation "com.squareup.okhttp3:okhttp:$okhttp"

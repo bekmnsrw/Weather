@@ -3,6 +3,7 @@ package com.example.android1.data.weather.datasource.remote
 import com.example.android1.data.weather.datasource.remote.response.MultipleWeatherResponse
 import com.example.android1.data.weather.datasource.remote.response.Sys
 import com.example.android1.data.weather.datasource.remote.response.WeatherResponse
+import io.reactivex.rxjava3.core.Single
 import retrofit2.http.GET
 import retrofit2.http.Query
 import retrofit2.http.QueryMap
@@ -10,17 +11,17 @@ import retrofit2.http.QueryMap
 interface WeatherApi {
 
     @GET("weather")
-    suspend fun getCityId(
+    fun getCityId(
         @Query("q") cityName: String
-    ): Sys
+    ): Single<Sys>
 
     @GET("weather")
-    suspend fun getWeather(
+    fun getWeather(
         @Query("id") cityId: Int
-    ): WeatherResponse
+    ): Single<WeatherResponse>
 
     @GET("find")
-    suspend fun getWeatherInNearbyCities(
+    fun getWeatherInNearbyCities(
         @QueryMap map: Map<String, String>
-    ): MultipleWeatherResponse
+    ): Single<MultipleWeatherResponse>
 }

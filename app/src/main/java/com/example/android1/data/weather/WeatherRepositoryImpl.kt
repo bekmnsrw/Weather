@@ -7,6 +7,9 @@ import com.example.android1.data.weather.mapper.toWeatherMainInfoList
 import com.example.android1.domain.weather.WeatherDetailedInfo
 import com.example.android1.domain.weather.WeatherMainInfo
 import com.example.android1.domain.weather.WeatherRepository
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.schedulers.Schedulers
 import javax.inject.Inject
 
 class WeatherRepositoryImpl @Inject constructor(
@@ -14,23 +17,35 @@ class WeatherRepositoryImpl @Inject constructor(
     private val weatherMainInfoCache: WeatherMainInfoCache
 ) : WeatherRepository {
 
-    override suspend fun getWeather(
+    override fun getWeather(
         cityId: Int
-    ): WeatherDetailedInfo = weatherApi.getWeather(cityId).toWeatherDetailedInfo()
+    ): Single<WeatherDetailedInfo> = weatherApi.getWeather(cityId)
+        .observeOn(Schedulers.computation())
+        .map { it.toWeatherDetailedInfo() }
+        .subscribeOn(Schedulers.io())
 
-    override suspend fun getWeatherInNearbyCities(
+    override fun getWeatherInNearbyCities(
         query: Map<String, String>,
         isLocal: Boolean
-    ): List<WeatherMainInfo> =
+    ): Single<List<WeatherMainInfo>> =
         if (isLocal) {
-            weatherMainInfoCache.cache
+            Observable.fromIterable(weatherMainInfoCache.cache).toList()
         } else {
-            weatherApi.getWeatherInNearbyCities(query).list.toWeatherMainInfoList().also {
-                weatherMainInfoCache.cache = it.toMutableList()
-            }
+            weatherApi.getWeatherInNearbyCities(query)
+                .observeOn(Schedulers.computation())
+                .map { response ->
+                    response.list.toWeatherMainInfoList().also {
+                        weatherMainInfoCache.cache = it.toMutableList()
+                    }
+                }
+                .subscribeOn(Schedulers.io())
         }
 
-    override suspend fun getCityId(
+
+    override fun getCityId(
         cityName: String
-    ): Int = weatherApi.getCityId(cityName).id
+    ): Single<Int> = weatherApi.getCityId(cityName)
+        .observeOn(Schedulers.computation())
+        .map { it.id }
+        .subscribeOn(Schedulers.io())
 }
