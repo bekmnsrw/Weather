@@ -43,7 +43,11 @@ class DetailedFragment : Fragment(R.layout.fragment_detailed) {
         super.onViewCreated(view, savedInstanceState)
         viewBinding = FragmentDetailedBinding.bind(view)
 
-        viewModel.getWeatherInCity(cityId!!)
+        viewBinding?.run {
+            cityId?.let {
+                viewModel.getWeatherInCity(it)
+            }
+        }
 
         observeViewModel()
 
