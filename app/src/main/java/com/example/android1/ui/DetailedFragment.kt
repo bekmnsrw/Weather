@@ -33,7 +33,9 @@ class DetailedFragment : Fragment(R.layout.fragment_detailed) {
         viewBinding = FragmentDetailedBinding.bind(view)
 
         viewBinding?.run {
-            loadWeather(cityId!!)
+            cityId?.let {
+                loadWeather(it)
+            }
 
             btnIconBack.setOnClickListener {
                 navigateOnMainFragment()
