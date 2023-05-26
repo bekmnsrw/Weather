@@ -40,7 +40,6 @@ class DetailedFragment : Fragment(R.layout.fragment_detailed) {
 
         if (args.cityId != -1) {
             viewModel.getWeatherInCity()
-        }
 
         observeViewModel()
 
