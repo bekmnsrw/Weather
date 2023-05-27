@@ -32,7 +32,7 @@ fun List<MultipleCity>.toWeatherMainInfoList(): List<WeatherMainInfo> = map {
     it.toWeatherMainInfo()
 }
 
-private fun calculateColor(
+fun calculateColor(
     temperature: Double
 ): Int = when {
     temperature < -30.0 -> {
