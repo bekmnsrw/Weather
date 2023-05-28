@@ -82,7 +82,7 @@ class WeatherDetailedInfoViewModelTest {
         viewModel.getWeatherInCity()
 
         assertEquals(expectedWeather, viewModel.weatherDetailedInfo.getOrAwaitValue())
-        assertTrue(viewModel.error.value == null)
+        assertTrue(viewModel.error.getOrAwaitValue() == null)
     }
 
     @Test
@@ -93,7 +93,7 @@ class WeatherDetailedInfoViewModelTest {
 
         viewModel.getWeatherInCity()
 
-        assertTrue(viewModel.error.value is UnknownHostException)
+        assertTrue(viewModel.error.getOrAwaitValue() is UnknownHostException)
     }
 
     @Test
@@ -104,7 +104,7 @@ class WeatherDetailedInfoViewModelTest {
 
         viewModel.getWeatherInCity()
 
-        assertTrue(viewModel.error.value is Throwable)
+        assertTrue(viewModel.error.getOrAwaitValue() is Throwable)
     }
 
     @After

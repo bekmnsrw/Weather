@@ -76,7 +76,7 @@ class WeatherMainInfoViewModel @Inject constructor(
                 _loading.value = true
                 getCityIdUseCase.invoke(cityName).also {
                     _cityId.value = it
-                    _cityId.value = null
+//                    _cityId.value = null
                 }
             } catch (noInternetConnection: UnknownHostException) {
                 showInternetConnectionError.value = true
