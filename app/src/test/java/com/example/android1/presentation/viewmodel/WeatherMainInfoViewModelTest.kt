@@ -242,13 +242,6 @@ class WeatherMainInfoViewModelTest {
                 every { cityName } returns "Kazan"
                 every { temperature } returns 25.5
                 every { temperatureTextViewColor } returns 1
-            },
-            mockk {
-                every { cityId } returns 2
-                every { weatherIcon } returns "test2"
-                every { cityName } returns "Moscow"
-                every { temperature } returns 26.0
-                every { temperatureTextViewColor } returns 2
             }
         )
 
@@ -259,13 +252,6 @@ class WeatherMainInfoViewModelTest {
                 cityName = "Kazan",
                 temperature = 25.5,
                 temperatureTextViewColor = 1
-            ),
-            WeatherMainInfo(
-                cityId = 2,
-                weatherIcon = "test2",
-                cityName = "Moscow",
-                temperature = 26.0,
-                temperatureTextViewColor = 2
             )
         )
 
@@ -289,9 +275,7 @@ class WeatherMainInfoViewModelTest {
 
         viewModel.loading.observeForever(loadingObserver)
 
-        every {
-            loadingObserver.onChanged(capture(slot))
-        } answers {
+        every { loadingObserver.onChanged(capture(slot)) } answers {
             loadingHistory.add(slot.captured)
         }
 
