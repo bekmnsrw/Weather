@@ -1,11 +1,13 @@
 package com.example.android1.presentation.viewmodel
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.Observer
 import com.example.android1.domain.weather.GetWeatherDetailedInfoUseCase
 import com.example.android1.domain.weather.WeatherDetailedInfo
 import com.example.android1.utils.getOrAwaitValue
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
+import io.mockk.impl.annotations.RelaxedMockK
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestDispatcher
@@ -19,6 +21,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TestRule
 import java.net.UnknownHostException
+import kotlin.test.assertContentEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class WeatherDetailedInfoViewModelTest {
@@ -35,6 +38,11 @@ class WeatherDetailedInfoViewModelTest {
     @get:Rule
     val rule: TestRule = InstantTaskExecutorRule()
 
+    @RelaxedMockK
+    private lateinit var loadingObserver: Observer<Boolean>
+
+    private lateinit var loadingHistory: MutableList<Boolean>
+
     @Before
     fun setUp() {
         Dispatchers.setMain(dispatcher)
@@ -43,6 +51,7 @@ class WeatherDetailedInfoViewModelTest {
             getWeatherDetailedInfoUseCase = getWeatherDetailedInfoUseCase,
             cityId = cityId
         )
+        loadingHistory = mutableListOf()
     }
 
     @Test
@@ -75,36 +84,71 @@ class WeatherDetailedInfoViewModelTest {
             weatherDescription = "Sunny"
         )
 
+        val slot = slot<Boolean>()
+
         coEvery {
             getWeatherDetailedInfoUseCase.invoke(any())
         } returns mockWeather
+
+        viewModel.loading.observeForever(loadingObserver)
+
+        every {
+            loadingObserver.onChanged(capture(slot))
+        } answers {
+            loadingHistory.add(slot.captured)
+        }
 
         viewModel.getWeatherInCity()
 
         assertEquals(expectedWeather, viewModel.weatherDetailedInfo.getOrAwaitValue())
         assertTrue(viewModel.error.getOrAwaitValue() == null)
+        assertContentEquals(arrayListOf(true, false), loadingHistory)
     }
 
     @Test
     fun `When call getWeatherInCity and no Internet-connection, expect UnknownHostException being threw`() {
+        val slot = slot<Boolean>()
+
         coEvery {
             getWeatherDetailedInfoUseCase.invoke(any())
         } throws UnknownHostException()
 
+        viewModel.loading.observeForever(loadingObserver)
+
+        every {
+            loadingObserver.onChanged(capture(slot))
+        } answers {
+            loadingHistory.add(slot.captured)
+        }
+
         viewModel.getWeatherInCity()
 
         assertTrue(viewModel.error.getOrAwaitValue() is UnknownHostException)
+        assertTrue(viewModel.weatherDetailedInfo.getOrAwaitValue() == null)
+        assertContentEquals(arrayListOf(true, false), loadingHistory)
     }
 
     @Test
     fun `When call getWeatherInCity, expect Throwable`() {
+        val slot = slot<Boolean>()
+
         coEvery {
             getWeatherDetailedInfoUseCase.invoke(any())
         } throws Throwable()
 
+        viewModel.loading.observeForever(loadingObserver)
+
+        every {
+            loadingObserver.onChanged(capture(slot))
+        } answers {
+            loadingHistory.add(slot.captured)
+        }
+
         viewModel.getWeatherInCity()
 
         assertTrue(viewModel.error.getOrAwaitValue() is Throwable)
+        assertTrue(viewModel.weatherDetailedInfo.getOrAwaitValue() == null)
+        assertContentEquals(arrayListOf(true, false), loadingHistory)
     }
 
     @After
