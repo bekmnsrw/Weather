@@ -2,11 +2,8 @@ package com.example.android1.data.weather
 
 import com.example.android1.data.weather.datasource.local.WeatherMainInfoCache
 import com.example.android1.data.weather.datasource.remote.WeatherApi
-import com.example.android1.data.weather.datasource.remote.response.MultipleCity
 import com.example.android1.data.weather.datasource.remote.response.MultipleWeatherResponse
 import com.example.android1.data.weather.datasource.remote.response.WeatherResponse
-import com.example.android1.data.weather.mapper.calculateColor
-import com.example.android1.data.weather.mapper.toWeatherMainInfoList
 import com.example.android1.domain.weather.WeatherDetailedInfo
 import com.example.android1.domain.weather.WeatherMainInfo
 import io.mockk.*
@@ -224,75 +221,60 @@ class WeatherRepositoryImplTest {
             }
         }
 
-//    @Test
-//    fun `When call getWeatherInNearbyCities from remote datasource, expect list of WeatherMainInfo`() =
-//        runTest {
-//            // arrange
-//            val requestQuery: Map<String, String> = mapOf(
-//                "lat" to "53.4",
-//                "lon" to "54.3",
-//                "cnt" to "3"
-//            )
-//
-//            val requestIsLocal: Boolean = false
-//
-//            val expectedResult: List<WeatherMainInfo> = arrayListOf(
-//                WeatherMainInfo(
-//                    cityId = 1,
-//                    weatherIcon = "test1",
-//                    cityName = "Kazan",
-//                    temperature = 25.5,
-//                    temperatureTextViewColor = calculateColor(25.5),
-//                ),
-//                WeatherMainInfo(
-//                    cityId = 2,
-//                    weatherIcon = "test2",
-//                    cityName = "Kazan",
-//                    temperature = 26.0,
-//                    temperatureTextViewColor = calculateColor(26.0),
-//                )
-//            )
-//
-//            val expectedData: MultipleWeatherResponse = mockk {
-//                every { list } returns arrayListOf(
-//                    mockk {
-//                        every { id } returns 1
-//                        every { name } returns "Kazan"
-//                        every { weather } returns arrayListOf(
-//                            mockk {
-//                                every { icon } returns "test1"
-//                            }
-//                        )
-//                        every { main } returns mockk {
-//                            every { temp } returns 25.5
-//                        }
-//                    },
-//                    mockk {
-//                        every { id } returns 2
-//                        every { name } returns "Moscow"
-//                        every { weather } returns arrayListOf(
-//                            mockk {
-//                                every { icon } returns "test2"
-//                            }
-//                        )
-//                        every { main } returns mockk {
-//                            every { temp } returns 26.0
-//                        }
-//                    }
-//                )
-//            }
-//
-//            coEvery {
-//                weatherApi.getWeatherInNearbyCities(map = requestQuery)
-//            } returns expectedData
-//
-//            // act
-//            val result = weatherRepositoryImpl.getWeatherInNearbyCities(
-//                query = requestQuery,
-//                isLocal = requestIsLocal
-//            )
-//
-//            // assert
-//            assertEquals(expectedResult, result)
-//        }
+    @Test
+    fun `When call getWeatherInNearbyCities from remote datasource, expect list of WeatherMainInfo`() =
+        runTest {
+            // arrange
+            val requestQuery: Map<String, String> = mapOf(
+                "lat" to "53.4",
+                "lon" to "54.3",
+                "cnt" to "3"
+            )
+
+            val requestIsLocal: Boolean = false
+
+            val expectedResult: List<WeatherMainInfo> = arrayListOf(
+                WeatherMainInfo(
+                    cityId = 1,
+                    weatherIcon = "test1",
+                    cityName = "Kazan",
+                    temperature = 25.5,
+                    temperatureTextViewColor = 2_131_034_776
+                )
+            )
+
+            val expectedRemoteData: MultipleWeatherResponse = mockk {
+                every { list } returns arrayListOf(
+                    mockk {
+                        every { id } returns 1
+                        every { name } returns "Kazan"
+                        every { main } returns mockk {
+                            every { temp } returns 25.5
+                            every { weather } returns arrayListOf(
+                                mockk {
+                                    every { icon } returns "test1"
+                                }
+                            )
+                        }
+                    }
+                )
+            }
+
+            every { weatherMainInfoCache.cache } returns arrayListOf()
+
+            every { weatherMainInfoCache.cache = capture(arrayListOf()) } just runs
+
+            coEvery {
+                weatherApi.getWeatherInNearbyCities(map = requestQuery)
+            } returns expectedRemoteData
+
+            // act
+            val result = weatherRepositoryImpl.getWeatherInNearbyCities(
+                query = requestQuery,
+                isLocal = requestIsLocal
+            )
+
+            // assert
+            assertEquals(expectedResult, result)
+        }
 }
