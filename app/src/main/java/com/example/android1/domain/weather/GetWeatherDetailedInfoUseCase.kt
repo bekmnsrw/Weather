@@ -1,6 +1,8 @@
 package com.example.android1.domain.weather
 
-class GetWeatherDetailedInfoUseCase(
+import javax.inject.Inject
+
+class GetWeatherDetailedInfoUseCase @Inject constructor(
     private val weatherRepository: WeatherRepository
 ) {
 

@@ -1,20 +1,24 @@
 package com.example.android1.presentation.main
 
-import androidx.lifecycle.*
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.android1.domain.geolocation.GeoLocation
 import com.example.android1.domain.geolocation.GetGeoLocationUseCase
 import com.example.android1.domain.weather.GetCityIdUseCase
 import com.example.android1.domain.weather.GetWeatherMainInfoUseCase
 import com.example.android1.domain.weather.WeatherMainInfo
 import com.example.android1.utils.SingleLiveEvent
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import timber.log.Timber
 import java.net.UnknownHostException
+import javax.inject.Inject
 
-class WeatherMainInfoViewModel(
+@HiltViewModel
+class WeatherMainInfoViewModel @Inject constructor(
     private val getWeatherMainInfoUseCase: GetWeatherMainInfoUseCase,
     private val getCityIdUseCase: GetCityIdUseCase,
     private val getGeoLocationUseCase: GetGeoLocationUseCase
@@ -124,18 +128,6 @@ class WeatherMainInfoViewModel(
             }
             finally {
                 _loading.value = false
-            }
-        }
-    }
-
-    companion object {
-        fun provideFactory(
-            weatherMainInfoUseCase: GetWeatherMainInfoUseCase,
-            cityIdUseCase: GetCityIdUseCase,
-            geoLocationUseCase: GetGeoLocationUseCase
-        ): ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                WeatherMainInfoViewModel(weatherMainInfoUseCase, cityIdUseCase, geoLocationUseCase)
             }
         }
     }

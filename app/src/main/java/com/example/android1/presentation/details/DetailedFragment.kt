@@ -6,47 +6,39 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import coil.load
-import com.example.android1.App
 import com.example.android1.R
 import com.example.android1.databinding.FragmentDetailedBinding
-import com.example.android1.domain.weather.GetWeatherDetailedInfoUseCase
-import com.example.android1.presentation.main.MainFragment
 import com.example.android1.utils.convertMillisecondsToHoursAndMinutes
 import com.example.android1.utils.convertPressureIntoMmHg
 import com.example.android1.utils.convertWindAngleIntoDirection
 import com.example.android1.utils.showSnackbar
+import dagger.hilt.android.AndroidEntryPoint
 import java.net.UnknownHostException
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
+@AndroidEntryPoint
 class DetailedFragment : Fragment(R.layout.fragment_detailed) {
 
     private var viewBinding: FragmentDetailedBinding? = null
 
-    private var cityId: Int? = null
+    private val args: DetailedFragmentArgs by navArgs()
 
     @Inject
-    lateinit var weatherDetailedInfoUseCase: GetWeatherDetailedInfoUseCase
+    lateinit var viewModelFactory: WeatherDetailedInfoViewModel.WeatherDetailedInfoViewModelFactory
 
     private val viewModel: WeatherDetailedInfoViewModel by viewModels {
-        WeatherDetailedInfoViewModel.provideFactory(weatherDetailedInfoUseCase)
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        App.appComponent.injectDetailedFragment(this)
-        super.onCreate(savedInstanceState)
-        cityId = arguments?.getInt(MainFragment.CITY_ID)
+        WeatherDetailedInfoViewModel.provideFactory(viewModelFactory, args.cityId)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewBinding = FragmentDetailedBinding.bind(view)
 
-        viewBinding?.run {
-            cityId?.let {
-                viewModel.getWeatherInCity(it)
-            }
+        if (args.cityId != -1) {
+            viewModel.getWeatherInCity()
         }
 
         observeViewModel()

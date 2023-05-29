@@ -17,38 +17,20 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.example.android1.App
 import com.example.android1.R
 import com.example.android1.data.weather.datasource.local.WeatherMainInfoCache.cache
 import com.example.android1.databinding.FragmentMainBinding
-import com.example.android1.domain.geolocation.GetGeoLocationUseCase
-import com.example.android1.domain.weather.GetCityIdUseCase
-import com.example.android1.domain.weather.GetWeatherMainInfoUseCase
 import com.example.android1.presentation.details.CustomItemDecorator
 import com.example.android1.presentation.details.WeatherListAdapter
 import com.example.android1.utils.showSnackbar
-import javax.inject.Inject
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainFragment : Fragment(R.layout.fragment_main) {
 
     private var viewBinding: FragmentMainBinding? = null
 
-    @Inject
-    lateinit var weatherMainInfoUseCase: GetWeatherMainInfoUseCase
-
-    @Inject
-    lateinit var cityIdUseCase: GetCityIdUseCase
-
-    @Inject
-    lateinit var geoLocationUseCase: GetGeoLocationUseCase
-
-    private val viewModel: WeatherMainInfoViewModel by viewModels {
-        WeatherMainInfoViewModel.provideFactory(
-            weatherMainInfoUseCase,
-            cityIdUseCase,
-            geoLocationUseCase
-        )
-    }
+    private val viewModel: WeatherMainInfoViewModel by viewModels()
 
     private var adapter: WeatherListAdapter? = null
 
@@ -91,7 +73,6 @@ class MainFragment : Fragment(R.layout.fragment_main) {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        App.appComponent.injectMainFragment(this)
         super.onCreate(savedInstanceState)
         requestLocationPermissions()
     }
@@ -210,11 +191,8 @@ class MainFragment : Fragment(R.layout.fragment_main) {
     }
 
     private fun navigateOnDetailedFragment(cityId: Int) {
-        val bundle = Bundle()
-        bundle.putInt(CITY_ID, cityId)
-
-        findNavController()
-            .navigate(R.id.action_mainFragment_to_detailedFragment, bundle)
+        val action = MainFragmentDirections.actionMainFragmentToDetailedFragment(cityId)
+        findNavController().navigate(action)
     }
 
     private fun showLoading(isShow: Boolean) {
@@ -265,7 +243,5 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         private const val DEFAULT_LATITUDE = 10.0
         private const val RV_SPACING = 16.0F
         private const val NUMBER_OF_CITIES = 10
-
-        const val CITY_ID = "CITY_ID"
     }
 }

@@ -1,6 +1,8 @@
 package com.example.android1.domain.geolocation
 
-class GetGeoLocationUseCase(
+import javax.inject.Inject
+
+class GetGeoLocationUseCase @Inject constructor(
     private val geoLocationRepository: GeoLocationRepository
 ) {
     suspend operator fun invoke(

@@ -1,15 +1,17 @@
 package com.example.android1.presentation.details
 
 import androidx.lifecycle.*
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.android1.domain.weather.GetWeatherDetailedInfoUseCase
 import com.example.android1.domain.weather.WeatherDetailedInfo
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.launch
 import java.net.UnknownHostException
 
-class WeatherDetailedInfoViewModel(
-    private val getWeatherDetailedInfoUseCase: GetWeatherDetailedInfoUseCase
+class WeatherDetailedInfoViewModel @AssistedInject constructor(
+    private val getWeatherDetailedInfoUseCase: GetWeatherDetailedInfoUseCase,
+    @Assisted private val cityId: Int
 ): ViewModel() {
 
     private val _loading = MutableLiveData(false)
@@ -24,11 +26,11 @@ class WeatherDetailedInfoViewModel(
     val weatherDetailedInfo: LiveData<WeatherDetailedInfo>
         get() = _weatherDetailedInfo
 
-    fun getWeatherInCity(cityId: Int) {
-        loadWeather(cityId)
+    fun getWeatherInCity() {
+        loadWeather()
     }
 
-    private fun loadWeather(cityId: Int) {
+    private fun loadWeather() {
         viewModelScope.launch {
             try {
                 _loading.value = true
@@ -45,13 +47,23 @@ class WeatherDetailedInfoViewModel(
         }
     }
 
+    @AssistedFactory
+    interface WeatherDetailedInfoViewModelFactory {
+
+        fun create(cityId: Int): WeatherDetailedInfoViewModel
+    }
+
     companion object {
+
         fun provideFactory(
-            weatherDetailedInfoUseCase: GetWeatherDetailedInfoUseCase
-        ): ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                WeatherDetailedInfoViewModel(weatherDetailedInfoUseCase)
-            }
+            assistedFactory: WeatherDetailedInfoViewModelFactory,
+            cityId: Int
+        ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel> create(
+                modelClass: Class<T>
+            ): T = assistedFactory.create(cityId) as T
         }
     }
 }
