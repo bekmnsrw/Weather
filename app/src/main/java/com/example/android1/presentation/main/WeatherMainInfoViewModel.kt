@@ -1,4 +1,4 @@
-package com.example.android1.presentation.viewmodel
+package com.example.android1.presentation.main
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -9,6 +9,7 @@ import com.example.android1.domain.geolocation.GetGeoLocationUseCase
 import com.example.android1.domain.weather.GetCityIdUseCase
 import com.example.android1.domain.weather.GetWeatherMainInfoUseCase
 import com.example.android1.domain.weather.WeatherMainInfo
+import com.example.android1.utils.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -27,23 +28,21 @@ class WeatherMainInfoViewModel @Inject constructor(
     val loading: LiveData<Boolean>
         get() = _loading
 
-    private val _error = MutableLiveData<Throwable?>(null)
-    val error: LiveData<Throwable?>
-        get() = _error
-
     private val _weatherDetailedInfo = MutableLiveData<List<WeatherMainInfo>>(null)
     val weatherDetailedInfo: LiveData<List<WeatherMainInfo>>
         get() = _weatherDetailedInfo
 
-    private val _cityId = MutableLiveData<Int?>(null)
-    val cityId: LiveData<Int?>
+    private val _cityId = SingleLiveEvent<Int>()
+    val cityId: SingleLiveEvent<Int>
         get() = _cityId
 
-    val showLocationAlertDialog = MutableLiveData(false)
+    private val _errorMessage = SingleLiveEvent<String>()
+    val errorMessage: SingleLiveEvent<String>
+        get() = _errorMessage
 
-    val showHttpError = MutableLiveData(false)
-
-    val showInternetConnectionError = MutableLiveData(false)
+    private val _shouldShowAlertDialog = SingleLiveEvent<Boolean>()
+    val shouldShowAlertDialog: SingleLiveEvent<Boolean>
+        get() = _shouldShowAlertDialog
 
     private val _geoLocation = MutableLiveData<GeoLocation>(null)
     val geoLocation: LiveData<GeoLocation>
@@ -60,8 +59,8 @@ class WeatherMainInfoViewModel @Inject constructor(
                     _geoLocation.value = it
                 }
             } catch (error: Throwable) {
-                _error.value = error
-                Timber.e("$error")
+                _errorMessage.value = "Can't find your location"
+                Timber.e(error.message)
             }
         }
     }
@@ -76,16 +75,13 @@ class WeatherMainInfoViewModel @Inject constructor(
                 _loading.value = true
                 getCityIdUseCase.invoke(cityName).also {
                     _cityId.value = it
-                    _cityId.value = null
                 }
             } catch (noInternetConnection: UnknownHostException) {
-                showInternetConnectionError.value = true
-                _error.value = noInternetConnection
+                _errorMessage.value = "Please, turn on Internet connection"
             } catch (httpException: HttpException) {
-                showHttpError.value = false
-                _error.value = httpException
+                _errorMessage.value = "Sorry, can't find city with such name"
             } catch (error: Throwable) {
-                _error.value = error
+                _errorMessage.value = "Sorry, something went wrong"
             } finally {
                 _loading.value = false
             }
@@ -126,9 +122,9 @@ class WeatherMainInfoViewModel @Inject constructor(
                     _weatherDetailedInfo.value = it
                 }
             } catch (noInternetConnection: UnknownHostException) {
-                _error.value = noInternetConnection
+                _errorMessage.value = "Please, turn on Internet connection"
             } catch (error: Throwable) {
-                _error.value = error
+                _errorMessage.value = "Sorry, something went wrong"
             }
             finally {
                 _loading.value = false
