@@ -63,7 +63,7 @@ class WeatherMainInfoViewModel @Inject constructor(
             .subscribeBy(onSuccess = {
                 _geoLocation.value = it
             }, onError = {
-                _error.value = it
+                _errorMessage.value = "Sorry, can't find your location"
             })
     }
 
@@ -78,13 +78,18 @@ class WeatherMainInfoViewModel @Inject constructor(
             .doAfterTerminate { _loading.value = false }
             .subscribeBy(onSuccess = {
                 _cityId.value = it
-                _cityId.value = null
             }, onError = {
                 when (it.javaClass) {
-                    UnknownHostException::class.java -> showInternetConnectionError.value = false
-                    HttpException::class.java -> showHttpError.value = false
+                    UnknownHostException::class.java -> {
+                        _errorMessage.value = "Please, turn on Internet connection"
+                    }
+                    HttpException::class.java -> {
+                        _errorMessage.value = "Sorry, cant find such city"
+                    }
+                    else -> {
+                        _errorMessage.value = "Sorry, something went wrong"
+                    }
                 }
-                _error.value = it
             })
     }
 
@@ -122,7 +127,7 @@ class WeatherMainInfoViewModel @Inject constructor(
             .subscribeBy(onSuccess = {
                 _weatherDetailedInfo.value = it
             }, onError = {
-                _error.value = it
+                _errorMessage.value = "Sorry, something went wrong"
             })
     }
 

@@ -30,8 +30,6 @@ import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.kotlin.subscribeBy
-import retrofit2.adapter.rxjava3.HttpException
-import java.net.UnknownHostException
 import java.util.concurrent.TimeUnit
 
 @AndroidEntryPoint
