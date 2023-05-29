@@ -1,4 +1,4 @@
-package com.example.android1.presentation.viewmodel
+package com.example.android1.presentation.details
 
 import androidx.lifecycle.*
 import com.example.android1.domain.weather.GetWeatherDetailedInfoUseCase

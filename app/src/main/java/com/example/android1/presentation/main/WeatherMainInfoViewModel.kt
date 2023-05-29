@@ -1,4 +1,4 @@
-package com.example.android1.presentation.viewmodel
+package com.example.android1.presentation.main
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -8,6 +8,7 @@ import com.example.android1.domain.geolocation.GetGeoLocationUseCase
 import com.example.android1.domain.weather.GetCityIdUseCase
 import com.example.android1.domain.weather.GetWeatherMainInfoUseCase
 import com.example.android1.domain.weather.WeatherMainInfo
+import com.example.android1.utils.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -29,23 +30,21 @@ class WeatherMainInfoViewModel @Inject constructor(
     val loading: LiveData<Boolean>
         get() = _loading
 
-    private val _error = MutableLiveData<Throwable?>(null)
-    val error: LiveData<Throwable?>
-        get() = _error
-
     private val _weatherDetailedInfo = MutableLiveData<List<WeatherMainInfo>>(null)
     val weatherDetailedInfo: LiveData<List<WeatherMainInfo>>
         get() = _weatherDetailedInfo
 
-    private val _cityId = MutableLiveData<Int?>(null)
-    val cityId: LiveData<Int?>
+    private val _cityId = SingleLiveEvent<Int>()
+    val cityId: SingleLiveEvent<Int>
         get() = _cityId
 
-    val showLocationAlertDialog = MutableLiveData(false)
+    private val _errorMessage = SingleLiveEvent<String>()
+    val errorMessage: SingleLiveEvent<String>
+        get() = _errorMessage
 
-    val showHttpError = MutableLiveData(false)
-
-    val showInternetConnectionError = MutableLiveData(false)
+    private val _shouldShowAlertDialog = SingleLiveEvent<Boolean>()
+    val shouldShowAlertDialog: SingleLiveEvent<Boolean>
+        get() = _shouldShowAlertDialog
 
     private val _geoLocation = MutableLiveData<GeoLocation>(null)
     val geoLocation: LiveData<GeoLocation>
