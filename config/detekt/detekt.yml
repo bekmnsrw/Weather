@@ -322,6 +322,7 @@ naming:
   FunctionMaxLength:
     active: true
     maximumFunctionNameLength: 40
+    excludes: [ '**/test/**' ]
   FunctionMinLength:
     active: true
     minimumFunctionNameLength: 3
@@ -591,6 +592,7 @@ style:
     excludeImportStatements: true
     excludeCommentStatements: true
     excludeRawStrings: true
+    excludes: [ '**/test/**' ]
   MayBeConst:
     active: true
   ModifierOrder:
