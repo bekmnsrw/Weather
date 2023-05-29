@@ -4,8 +4,8 @@ import android.content.Context
 import com.example.android1.di.module.GeoLocationModule
 import com.example.android1.di.module.NetworkModule
 import com.example.android1.di.module.WeatherModule
-import com.example.android1.presentation.DetailedFragment
-import com.example.android1.presentation.MainFragment
+import com.example.android1.presentation.details.DetailedFragment
+import com.example.android1.presentation.main.MainFragment
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
