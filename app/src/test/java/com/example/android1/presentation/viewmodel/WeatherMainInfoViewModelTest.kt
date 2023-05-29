@@ -7,6 +7,7 @@ import com.example.android1.domain.geolocation.GetGeoLocationUseCase
 import com.example.android1.domain.weather.GetCityIdUseCase
 import com.example.android1.domain.weather.GetWeatherMainInfoUseCase
 import com.example.android1.domain.weather.WeatherMainInfo
+import com.example.android1.presentation.main.WeatherMainInfoViewModel
 import com.example.android1.utils.getOrAwaitValue
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -87,7 +88,7 @@ class WeatherMainInfoViewModelTest {
         viewModel.getUserLocation(requestArePermissionsGranted)
 
         assertEquals(expectedGeoLocation, viewModel.geoLocation.getOrAwaitValue())
-        assertTrue(viewModel.error.getOrAwaitValue() == null)
+        assertEquals(null, viewModel.errorMessage.value)
     }
 
     @Test
@@ -111,7 +112,7 @@ class WeatherMainInfoViewModelTest {
         viewModel.getUserLocation(requestArePermissionsGranted)
 
         assertEquals(expectedGeoLocation, viewModel.geoLocation.getOrAwaitValue())
-        assertTrue(viewModel.error.getOrAwaitValue() == null)
+        assertEquals(null, viewModel.errorMessage.value)
     }
 
     @Test
@@ -122,7 +123,7 @@ class WeatherMainInfoViewModelTest {
 
         viewModel.getUserLocation(true)
 
-        assertTrue(viewModel.error.getOrAwaitValue() is Throwable)
+        assertTrue(viewModel.errorMessage.getOrAwaitValue() == "Can't find your location")
         assertTrue(viewModel.geoLocation.getOrAwaitValue() == null)
     }
 
@@ -149,8 +150,8 @@ class WeatherMainInfoViewModelTest {
         viewModel.getCityIdByName(requestCityName)
 
         assertEquals(expectedCityId, viewModel.cityId.getOrAwaitValue())
+        assertEquals(null, viewModel.errorMessage.value)
         assertContentEquals(arrayListOf(true, false), loadingHistory)
-        assertTrue(viewModel.error.getOrAwaitValue() == null)
     }
 
     @Test
@@ -173,9 +174,9 @@ class WeatherMainInfoViewModelTest {
 
         viewModel.getCityIdByName(requestCityName)
 
-        assertTrue(viewModel.error.getOrAwaitValue() is UnknownHostException)
+        assertTrue(viewModel.errorMessage.getOrAwaitValue() == "Please, turn on Internet connection")
         assertContentEquals(arrayListOf(true, false), loadingHistory)
-        assertTrue(viewModel.cityId.getOrAwaitValue() == null)
+        assertEquals(null, viewModel.cityId.value)
     }
 
     @Test
@@ -203,9 +204,10 @@ class WeatherMainInfoViewModelTest {
 
         viewModel.getCityIdByName(requestCityName)
 
-        assertTrue(viewModel.error.getOrAwaitValue() is HttpException)
+
+        assertTrue(viewModel.errorMessage.getOrAwaitValue() == "Sorry, can't find city with such name")
         assertContentEquals(arrayListOf(true, false), loadingHistory)
-        assertTrue(viewModel.cityId.getOrAwaitValue() == null)
+        assertEquals(null, viewModel.cityId.value)
     }
 
     @Test
@@ -228,9 +230,9 @@ class WeatherMainInfoViewModelTest {
 
         viewModel.getCityIdByName(requestCityName)
 
-        assertTrue(viewModel.error.getOrAwaitValue() is Throwable)
+        assertTrue(viewModel.errorMessage.getOrAwaitValue() == "Sorry, something went wrong")
         assertContentEquals(arrayListOf(true, false), loadingHistory)
-        assertTrue(viewModel.cityId.getOrAwaitValue() == null)
+        assertEquals(null, viewModel.cityId.value)
     }
 
     @Test
@@ -288,7 +290,7 @@ class WeatherMainInfoViewModelTest {
 
         assertEquals(expectedWeatherMainInfoList, viewModel.weatherDetailedInfo.getOrAwaitValue())
         assertContentEquals(arrayListOf(true, false), loadingHistory)
-        assertTrue(viewModel.error.getOrAwaitValue() == null)
+        assertEquals(null, viewModel.errorMessage.value)
     }
 
     @Test
@@ -326,7 +328,7 @@ class WeatherMainInfoViewModelTest {
             isLocal = requestIsLocal
         )
 
-        assertTrue(viewModel.error.getOrAwaitValue() is UnknownHostException)
+        assertTrue(viewModel.errorMessage.getOrAwaitValue() == "Please, turn on Internet connection")
         assertContentEquals(arrayListOf(true, false), loadingHistory)
         assertTrue(viewModel.weatherDetailedInfo.getOrAwaitValue() == null)
     }
@@ -366,7 +368,7 @@ class WeatherMainInfoViewModelTest {
             isLocal = requestIsLocal
         )
 
-        assertTrue(viewModel.error.getOrAwaitValue() is Throwable)
+        assertTrue(viewModel.errorMessage.getOrAwaitValue() == "Sorry, something went wrong")
         assertContentEquals(arrayListOf(true, false), loadingHistory)
         assertTrue(viewModel.weatherDetailedInfo.getOrAwaitValue() == null)
     }

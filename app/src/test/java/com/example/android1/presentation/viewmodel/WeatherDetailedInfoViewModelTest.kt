@@ -4,6 +4,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import com.example.android1.domain.weather.GetWeatherDetailedInfoUseCase
 import com.example.android1.domain.weather.WeatherDetailedInfo
+import com.example.android1.presentation.details.WeatherDetailedInfoViewModel
 import com.example.android1.utils.getOrAwaitValue
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
