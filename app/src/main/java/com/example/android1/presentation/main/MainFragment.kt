@@ -20,17 +20,10 @@ import androidx.navigation.fragment.findNavController
 import com.example.android1.R
 import com.example.android1.data.weather.datasource.local.WeatherMainInfoCache.cache
 import com.example.android1.databinding.FragmentMainBinding
-import com.example.android1.domain.geolocation.GetGeoLocationUseCase
-import com.example.android1.domain.weather.GetCityIdUseCase
-import com.example.android1.domain.weather.GetWeatherMainInfoUseCase
 import com.example.android1.presentation.details.CustomItemDecorator
 import com.example.android1.presentation.details.WeatherListAdapter
-import com.example.android1.presentation.viewmodel.WeatherMainInfoViewModel
 import com.example.android1.utils.showSnackbar
-import javax.inject.Inject
 import dagger.hilt.android.AndroidEntryPoint
-import retrofit2.HttpException
-import java.net.UnknownHostException
 
 @AndroidEntryPoint
 class MainFragment : Fragment(R.layout.fragment_main) {
@@ -146,7 +139,6 @@ class MainFragment : Fragment(R.layout.fragment_main) {
             }
 
             cityId.observe(viewLifecycleOwner) {
-                if (it == null) return@observe
                 navigateOnDetailedFragment(it)
             }
 

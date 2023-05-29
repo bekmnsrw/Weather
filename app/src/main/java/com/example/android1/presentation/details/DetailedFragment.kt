@@ -8,12 +8,8 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import coil.load
-import com.example.android1.App
 import com.example.android1.R
 import com.example.android1.databinding.FragmentDetailedBinding
-import com.example.android1.presentation.viewmodel.WeatherDetailedInfoViewModel
-import com.example.android1.domain.weather.GetWeatherDetailedInfoUseCase
-import com.example.android1.presentation.main.MainFragment
 import com.example.android1.utils.convertMillisecondsToHoursAndMinutes
 import com.example.android1.utils.convertPressureIntoMmHg
 import com.example.android1.utils.convertWindAngleIntoDirection
