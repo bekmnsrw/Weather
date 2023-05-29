@@ -1,4 +1,4 @@
-package com.example.android1.presentation
+package com.example.android1.presentation.details
 
 import android.os.Bundle
 import android.view.View
@@ -9,7 +9,7 @@ import androidx.navigation.fragment.findNavController
 import coil.load
 import com.example.android1.R
 import com.example.android1.databinding.FragmentDetailedBinding
-import com.example.android1.presentation.viewmodel.WeatherDetailedInfoViewModel
+import com.example.android1.presentation.main.MainFragment
 import com.example.android1.utils.convertMillisecondsToHoursAndMinutes
 import com.example.android1.utils.convertPressureIntoMmHg
 import com.example.android1.utils.convertWindAngleIntoDirection
