@@ -1,3 +1,18 @@
 <resources>
     <string name="app_name">Android1</string>
+
+    <string name="temperature">%1$d°</string>
+    <string name="pressure">%1$d mmHg</string>
+    <string name="humidity">%1$d%%</string>
+    <string name="feels_like">Feels like: %1$d°</string>
+    <string name="wind_speed">%1$d m/s</string>
+    <string name="icon_load_path">https://openweathermap.org/img/w/%1$s.png</string>
+
+    <string name="general_error_message">Sorry, something went wrong</string>
+    <string name="internet_connection_error_message">Please, turn on internet connection</string>
+    <string name="http_error_message">Sorry, can\'t find city with such name</string>
+    <string name="geo_location_error_message">Sorry, can\'t get your geo location</string>
+
+    <string name="alert_dialog_title">Location tracking is turned off</string>
+    <string name="alert_dialog_message">"Can\'t get your current location to show relevant weather data. You can provide location access in app settings.\n\nWould you like to open app settings?"</string>
 </resources>

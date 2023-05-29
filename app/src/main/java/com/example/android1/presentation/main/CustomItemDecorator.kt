@@ -1,4 +1,4 @@
-package com.example.android1.ui
+package com.example.android1.presentation.main
 
 import android.content.Context
 import android.graphics.Rect
