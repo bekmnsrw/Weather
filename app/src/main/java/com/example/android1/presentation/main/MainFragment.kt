@@ -1,4 +1,4 @@
-package com.example.android1.presentation
+package com.example.android1.presentation.main
 
 import android.Manifest
 import android.app.AlertDialog
@@ -20,11 +20,10 @@ import androidx.navigation.fragment.findNavController
 import com.example.android1.R
 import com.example.android1.data.weather.datasource.local.WeatherMainInfoCache.cache
 import com.example.android1.databinding.FragmentMainBinding
-import com.example.android1.presentation.viewmodel.WeatherMainInfoViewModel
+import com.example.android1.presentation.details.CustomItemDecorator
+import com.example.android1.presentation.details.WeatherListAdapter
 import com.example.android1.utils.showSnackbar
 import dagger.hilt.android.AndroidEntryPoint
-import retrofit2.HttpException
-import java.net.UnknownHostException
 
 @AndroidEntryPoint
 class MainFragment : Fragment(R.layout.fragment_main) {
@@ -92,11 +91,8 @@ class MainFragment : Fragment(R.layout.fragment_main) {
     }
 
     private fun suggestUserToTurnOnGPS() {
-        viewModel.showLocationAlertDialog.observe(viewLifecycleOwner) {
-            if (it == false) {
-                showAlertDialog(requireContext())
-                viewModel.showLocationAlertDialog.value = true
-            }
+        viewModel.shouldShowAlertDialog.observe(viewLifecycleOwner) {
+            showAlertDialog(requireContext())
         }
     }
 
@@ -138,31 +134,11 @@ class MainFragment : Fragment(R.layout.fragment_main) {
                 adapter?.submitList(it)
             }
 
-            error.observe(viewLifecycleOwner) {
-                if (it == null) return@observe
-
-                when (it.javaClass) {
-                    UnknownHostException::class.java -> {
-                        if (showInternetConnectionError.value == false) {
-                            showError(getString(R.string.internet_connection_error_message))
-                            showInternetConnectionError.value = true
-                        }
-                    }
-
-                    HttpException::class.java -> {
-                        if (showHttpError.value == false) {
-                            showError(getString(R.string.http_error_message))
-                            showHttpError.value = true
-                        }
-                    }
-
-                    else ->
-                        showError(getString(R.string.general_error_message))
-                }
+            errorMessage.observe(viewLifecycleOwner) {
+                showError(it)
             }
 
             cityId.observe(viewLifecycleOwner) {
-                if (it == null) return@observe
                 navigateOnDetailedFragment(it)
             }
 
