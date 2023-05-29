@@ -3,7 +3,6 @@ package com.example.android1.presentation.details
 import androidx.lifecycle.*
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.example.android1.di.DIContainer
 import com.example.android1.domain.weather.GetWeatherDetailedInfoUseCase
 import com.example.android1.domain.weather.WeatherDetailedInfo
 import kotlinx.coroutines.launch
@@ -47,10 +46,11 @@ class WeatherDetailedInfoViewModel(
     }
 
     companion object {
-        val Factory: ViewModelProvider.Factory = viewModelFactory {
+        fun provideFactory(
+            weatherDetailedInfoUseCase: GetWeatherDetailedInfoUseCase
+        ): ViewModelProvider.Factory = viewModelFactory {
             initializer {
-                val useCase = DIContainer.weatherDetailedInfoUseCase
-                WeatherDetailedInfoViewModel(useCase)
+                WeatherDetailedInfoViewModel(weatherDetailedInfoUseCase)
             }
         }
     }

@@ -3,7 +3,6 @@ package com.example.android1.presentation.main
 import androidx.lifecycle.*
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.example.android1.di.DIContainer
 import com.example.android1.domain.geolocation.GeoLocation
 import com.example.android1.domain.geolocation.GetGeoLocationUseCase
 import com.example.android1.domain.weather.GetCityIdUseCase
@@ -130,12 +129,13 @@ class WeatherMainInfoViewModel(
     }
 
     companion object {
-        val Factory: ViewModelProvider.Factory = viewModelFactory {
+        fun provideFactory(
+            weatherMainInfoUseCase: GetWeatherMainInfoUseCase,
+            cityIdUseCase: GetCityIdUseCase,
+            geoLocationUseCase: GetGeoLocationUseCase
+        ): ViewModelProvider.Factory = viewModelFactory {
             initializer {
-                val weatherInfoUseCase = DIContainer.weatherMainInfoUseCase
-                val cityIdUseCase = DIContainer.cityIdUseCase
-                val geoLocationUseCase = DIContainer.geoLocationUseCase
-                WeatherMainInfoViewModel(weatherInfoUseCase, cityIdUseCase, geoLocationUseCase)
+                WeatherMainInfoViewModel(weatherMainInfoUseCase, cityIdUseCase, geoLocationUseCase)
             }
         }
     }
