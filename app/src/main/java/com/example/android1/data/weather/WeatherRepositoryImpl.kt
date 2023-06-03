@@ -9,7 +9,6 @@ import com.example.android1.domain.weather.WeatherMainInfo
 import com.example.android1.domain.weather.WeatherRepository
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.schedulers.Schedulers
 import javax.inject.Inject
 
 class WeatherRepositoryImpl @Inject constructor(
@@ -19,10 +18,9 @@ class WeatherRepositoryImpl @Inject constructor(
 
     override fun getWeather(
         cityId: Int
-    ): Single<WeatherDetailedInfo> = weatherApi.getWeather(cityId)
-        .observeOn(Schedulers.computation())
-        .map { it.toWeatherDetailedInfo() }
-        .subscribeOn(Schedulers.io())
+    ): Single<WeatherDetailedInfo> = weatherApi.getWeather(cityId).map {
+        it.toWeatherDetailedInfo()
+    }
 
     override fun getWeatherInNearbyCities(
         query: Map<String, String>,
@@ -31,21 +29,14 @@ class WeatherRepositoryImpl @Inject constructor(
         if (isLocal) {
             Observable.fromIterable(weatherMainInfoCache.cache).toList()
         } else {
-            weatherApi.getWeatherInNearbyCities(query)
-                .observeOn(Schedulers.computation())
-                .map { response ->
-                    response.list.toWeatherMainInfoList().also {
-                        weatherMainInfoCache.cache = it.toMutableList()
-                    }
+            weatherApi.getWeatherInNearbyCities(query).map { response ->
+                response.list.toWeatherMainInfoList().also {
+                    weatherMainInfoCache.cache = it.toMutableList()
                 }
-                .subscribeOn(Schedulers.io())
+            }
         }
-
 
     override fun getCityId(
         cityName: String
-    ): Single<Int> = weatherApi.getCityId(cityName)
-        .observeOn(Schedulers.computation())
-        .map { it.id }
-        .subscribeOn(Schedulers.io())
+    ): Single<Int> = weatherApi.getCityId(cityName).map { it.id }
 }

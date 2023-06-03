@@ -15,6 +15,7 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.kotlin.plusAssign
 import io.reactivex.rxjava3.kotlin.subscribeBy
+import io.reactivex.rxjava3.schedulers.Schedulers
 import retrofit2.adapter.rxjava3.HttpException
 import java.net.UnknownHostException
 import javax.inject.Inject
@@ -59,6 +60,7 @@ class WeatherMainInfoViewModel @Inject constructor(
 
     private fun getLocation(arePermissionsGranted: Boolean) {
         geoLocationDisposable = getGeoLocationUseCase(arePermissionsGranted)
+            .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(onSuccess = {
                 _geoLocation.value = it
@@ -73,6 +75,7 @@ class WeatherMainInfoViewModel @Inject constructor(
 
     private fun getCityId(cityName: String) {
         weatherDisposable += getCityIdUseCase(cityName)
+            .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe { _loading.value = true }
             .doAfterTerminate { _loading.value = false }
@@ -121,6 +124,7 @@ class WeatherMainInfoViewModel @Inject constructor(
             ),
             isLocal
         )
+            .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe { _loading.value = true }
             .doAfterTerminate { _loading.value = false }

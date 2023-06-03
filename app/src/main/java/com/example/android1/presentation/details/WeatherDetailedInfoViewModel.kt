@@ -10,6 +10,7 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.plusAssign
 import io.reactivex.rxjava3.kotlin.subscribeBy
+import io.reactivex.rxjava3.schedulers.Schedulers
 
 class WeatherDetailedInfoViewModel @AssistedInject constructor(
     private val getWeatherDetailedInfoUseCase: GetWeatherDetailedInfoUseCase,
@@ -38,6 +39,7 @@ class WeatherDetailedInfoViewModel @AssistedInject constructor(
 
     private fun loadWeather() {
         weatherDisposable += getWeatherDetailedInfoUseCase(cityId)
+            .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe { _loading.value = true }
             .doAfterTerminate { _loading.value = false }
