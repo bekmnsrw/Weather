@@ -1,13 +1,15 @@
 package com.example.android1.domain.weather
 
+import io.reactivex.rxjava3.core.Single
+
 interface WeatherRepository {
 
-    suspend fun getWeather(cityId: Int): WeatherDetailedInfo
+    fun getWeather(cityId: Int): Single<WeatherDetailedInfo>
 
-    suspend fun getWeatherInNearbyCities(
+    fun getWeatherInNearbyCities(
         query: Map<String, String>,
         isLocal: Boolean
-    ): List<WeatherMainInfo>
+    ): Single<List<WeatherMainInfo>>
 
-    suspend fun getCityId(cityName: String): Int
+    fun getCityId(cityName: String): Single<Int>
 }

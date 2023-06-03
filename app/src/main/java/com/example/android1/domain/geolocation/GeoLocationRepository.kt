@@ -1,6 +1,8 @@
 package com.example.android1.domain.geolocation
 
+import io.reactivex.rxjava3.core.Single
+
 interface GeoLocationRepository {
 
-    suspend fun getLocation(arePermissionsGranted: Boolean): GeoLocation
+    fun getLocation(arePermissionsGranted: Boolean): Single<GeoLocation>
 }

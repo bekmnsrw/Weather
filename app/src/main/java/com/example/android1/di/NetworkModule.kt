@@ -15,6 +15,7 @@ import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
+import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
@@ -55,15 +56,20 @@ class NetworkModule {
     @Provides
     fun provideRetrofit(
         httpClient: OkHttpClient,
-        gsonConverterFactory: GsonConverterFactory
+        gsonConverterFactory: GsonConverterFactory,
+        rxJava3CallAdapterFactory: RxJava3CallAdapterFactory
     ): Retrofit = Retrofit.Builder()
         .client(httpClient)
         .addConverterFactory(gsonConverterFactory)
+        .addCallAdapterFactory(rxJava3CallAdapterFactory)
         .baseUrl(BuildConfig.API_ENDPOINT)
         .build()
 
     @Provides
     fun provideGsonConverterFactory(): GsonConverterFactory = GsonConverterFactory.create()
+
+    @Provides
+    fun provideRxJavaAdapterFactory(): RxJava3CallAdapterFactory = RxJava3CallAdapterFactory.create()
 
     @Provides
     fun provideWeatherApi(

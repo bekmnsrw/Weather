@@ -1,11 +1,12 @@
 package com.example.android1.domain.geolocation
 
+import io.reactivex.rxjava3.core.Single
 import javax.inject.Inject
 
 class GetGeoLocationUseCase @Inject constructor(
     private val geoLocationRepository: GeoLocationRepository
 ) {
-    suspend operator fun invoke(
+    operator fun invoke(
         arePermissionsGranted: Boolean
-    ): GeoLocation = geoLocationRepository.getLocation(arePermissionsGranted)
+    ): Single<GeoLocation> = geoLocationRepository.getLocation(arePermissionsGranted)
 }

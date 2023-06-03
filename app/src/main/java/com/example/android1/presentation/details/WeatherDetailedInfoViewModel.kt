@@ -6,8 +6,11 @@ import com.example.android1.domain.weather.WeatherDetailedInfo
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.launch
-import java.net.UnknownHostException
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.kotlin.plusAssign
+import io.reactivex.rxjava3.kotlin.subscribeBy
+import io.reactivex.rxjava3.schedulers.Schedulers
 
 class WeatherDetailedInfoViewModel @AssistedInject constructor(
     private val getWeatherDetailedInfoUseCase: GetWeatherDetailedInfoUseCase,
@@ -26,25 +29,30 @@ class WeatherDetailedInfoViewModel @AssistedInject constructor(
     val weatherDetailedInfo: LiveData<WeatherDetailedInfo>
         get() = _weatherDetailedInfo
 
+    val showInternetConnectionError = MutableLiveData(false)
+
+    private var weatherDisposable: CompositeDisposable = CompositeDisposable()
+
     fun getWeatherInCity() {
         loadWeather()
     }
 
     private fun loadWeather() {
-        viewModelScope.launch {
-            try {
-                _loading.value = true
-                getWeatherDetailedInfoUseCase.invoke(cityId).also { weather ->
-                    _weatherDetailedInfo.value = weather
-                }
-            } catch (noInternetConnection: UnknownHostException) {
-                _error.value = noInternetConnection
-            } catch (error: Throwable) {
-                _error.value = error
-            } finally {
-                _loading.value = false
-            }
-        }
+        weatherDisposable += getWeatherDetailedInfoUseCase(cityId)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnSubscribe { _loading.value = true }
+            .doAfterTerminate { _loading.value = false }
+            .subscribeBy(onSuccess = {
+                _weatherDetailedInfo.value = it
+            }, onError = {
+                _error.value = it
+            })
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        weatherDisposable.clear()
     }
 
     @AssistedFactory
