@@ -26,7 +26,7 @@ You can also enter city's name in search bar to find out what's the weather in i
 
 ***
 
-You can also follow this [link](https://drive.google.com/drive/folders/1pUMAHhiATXuxHM4Bo0a-BI1DWe21Dku9) to watch a video with app's functionality demonstration 
+You can also follow this [link](https://drive.google.com/file/d/1-5bpmX8iMsUu1W8pQPYrYPmGl_9JN-WR/view?usp=drive_link) to watch a video with app's functionality demonstration 
 
 # Technologies
 It's important to mention that due to it's my course project, some technologies had to be replaced in accordance with teacher's requirements (to practice with new technologies for me)
